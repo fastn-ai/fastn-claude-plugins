@@ -1,4 +1,4 @@
-# fastn Connect
+# Fastn Connect
 
 Build and run integrations on the fastn platform, straight from Claude. fastn is the embedded integration layer for SaaS: with the **`connect`** plugin installed, Claude can create connectors, plan syncs, author and test workflows, build embedded widgets, and run your organization's governed, multi-tenant automations - across every app your customers connect. The same integrations power **both your product's own features and the AI agents it runs for customers**, each with governed, audited access.
 
@@ -45,7 +45,9 @@ plugins/connect/
 { "fastn": { "type": "http", "url": "https://connect.fastn.dev/mcp" } }
 ```
 
-Set `url` to the endpoint your organization should hit (your org's gateway, or the default production endpoint) before distributing. This is the only configuration.
+Set `url` to the endpoint your organization should hit (your org's gateway, for example `https://connect.fastn.dev/<org>/mcp`, or the default production endpoint) before distributing. This is the only configuration.
+
+Note: the URL must be edited in the plugin source. Claude Desktop and claude.ai do not support user-configurable plugin values, and their plugin validation requires a literal http(s) URL in `.mcp.json` (`${user_config...}` substitution works in Claude Code only, so it is not used here).
 
 ## Install
 

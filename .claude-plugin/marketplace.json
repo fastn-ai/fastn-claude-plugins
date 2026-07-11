@@ -1,10 +1,10 @@
 {
   "name": "fastn",
   "metadata": {
-    "description": "fastn Connect - build and run integrations, connectors, workflows, and governed automations on the fastn platform, for both your product and the AI agents it runs, straight from Claude."
+    "description": "Fastn Connect - build and run integrations, connectors, workflows, and governed automations on the fastn platform, for both your product and the AI agents it runs, straight from Claude."
   },
   "owner": {
-    "name": "fastn",
+    "name": "Fastn",
     "email": "support@fastn.ai"
   },
   "plugins": [

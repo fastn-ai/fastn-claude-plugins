@@ -36,10 +36,42 @@ skill="${root}/skills/gateway/SKILL.md"
 body="$(awk 'fence>=2 {print; next} /^---[[:space:]]*$/ {fence++}' "$skill")"
 [ -n "$body" ] || body="$(cat "$skill")"  # no frontmatter -> use the whole file
 
+# Scan the persistent skills directories for skills previously installed from the gateway
+# and report them as facts. Every gateway install stamps `<!-- fastn skill: <slug> v<N> -->`
+# into its SKILL.md, so this is an exact inventory - it saves the model from guessing whether
+# a skill is installed, and leaves it one cheap `skill {"slugs":[...]}` call from knowing
+# whether the local copy is stale. The hook cannot ask the gateway itself (that needs OAuth).
+inventory=""
+for dir in "${PWD}/.claude/skills" "${HOME}/.claude/skills" "${HOME}/.copilot/skills"; do
+  [ -d "$dir" ] || continue
+  for md in "$dir"/*/SKILL.md; do
+    [ -f "$md" ] || continue
+    tag="$(grep -m1 -o '<!-- fastn skill: [A-Za-z0-9_-]\{1,\} v[0-9]\{1,\} -->' "$md" 2>/dev/null || true)"
+    [ -n "$tag" ] || continue
+    slug="$(printf '%s' "$tag" | sed 's/^<!-- fastn skill: //; s/ v[0-9]\{1,\} -->$//')"
+    ver="$(printf '%s' "$tag" | sed 's/^.* v//; s/ -->$//')"
+    inventory="${inventory}- ${slug} v${ver} -> $(dirname "$md")/
+"
+  done
+done
+
+if [ -n "$inventory" ]; then
+  inventory="## fastn skills already installed here (scanned at session start - authoritative)
+
+${inventory}
+Before using any of these, call \`skill {\"slugs\": [...]}\` once with their slugs and compare versions. Same version -> read the local copy from disk and follow it. Different version, or the skill you need is not listed above -> install it first, as the install section requires."
+else
+  inventory="## fastn skills already installed here (scanned at session start - authoritative)
+
+None. No skill has been installed from the gateway in this environment yet, so any skill you need must be discovered with \`skill {}\` and installed before use."
+fi
+
 # A short lead line makes the rules unambiguous; the body is the plugin skill verbatim.
 context="# fastn gateway - mandatory usage rules (auto-loaded; follow these before using any fastn gateway tool)
 
-${body}"
+${body}
+
+${inventory}"
 
 # JSON-encode the context. Backslash, quote, CR, tab, and newline cover every character
 # class SKILL.md contains; backslash must be escaped first.

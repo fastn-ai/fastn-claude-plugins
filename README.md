@@ -5,7 +5,7 @@ Build and run integrations on the fastn platform, straight from Claude or GitHub
 It does this by connecting Claude to fastn through one **governed MCP gateway** that **dynamically serves fastn's full, growing library of skills**. Installing the plugin does two things:
 
 1. **Registers fastn as an MCP server** - Claude connects directly, and fastn handles authentication, identity, and policy itself. No manual MCP setup.
-2. **Loads the usage skill** - persistent instructions that tell Claude how to discover (`list_skills`) and use that library.
+2. **Loads the usage skill** - persistent instructions that tell Claude how to discover that library (the gateway's `skill` tool), install a skill locally, and keep the local copy in sync with the published version.
 
 The library **loads on demand** - there are many skills, and new capabilities appear automatically as fastn publishes them, with nothing to reinstall. That is what makes a small plugin do a lot.
 
@@ -15,7 +15,8 @@ No local tools, no scripts, no runtime dependency: a manifest, an MCP registrati
 
 fastn is the embedded integration layer for SaaS. Through the gateway, and with no further setup after install, the agent can:
 
-- **discover** what fastn can do right now via `list_skills` (the library loads on demand from the gateway - there are many skills, and new ones appear automatically),
+- **discover** what fastn can do right now by calling the gateway's `skill` tool with `{}` (the library loads on demand - there are many skills, and new ones appear automatically),
+- **install a skill locally** from its signed zip and **keep it current** - every install is stamped with its published version, and the session-start hook reports the installed versions so a stale copy gets refreshed before it runs,
 - **build and release integrations**: create connectors, plan syncs, author and test workflows, and build embedded widgets - all through the gateway's skills,
 - **run governed, multi-tenant automations** end to end - powering both your product's features and the AI agents it runs for customers, with identity, policy, and redaction applied automatically,
 - **give your product's AI agents safe, governed access** to every connected system - every call scoped, audited, and policy-checked at the gateway,
@@ -38,8 +39,10 @@ plugins/connect/
   .claude-plugin/plugin.json          the plugin manifest
   .mcp.json                           registers the fastn gateway MCP server
   hooks/hooks.json                    loads the usage skill at session start
-  hooks/load-gateway-skill.sh         the session-start loader (emits JSON that both
-                                      Claude Code and Copilot CLI inject as context)
+  hooks/load-gateway-skill.sh         the session-start loader: injects the usage skill plus
+                                      an inventory of already-installed fastn skills and their
+                                      versions (emits JSON that both Claude Code and Copilot
+                                      CLI inject as context)
   skills/gateway/SKILL.md             the fastn usage skill
 ```
 

@@ -57,54 +57,73 @@ Reading never executes anything. To *run* a skill, call it by its slug like any 
 
 ## Install and version-sync (mandatory)
 
-Running a skill through its gateway tool re-ships the full instructions every call, which is expensive. A local copy is cheap - but only if it is current. So:
+Running a skill through its gateway tool re-ships the full instructions every call, which is expensive. A saved copy is cheap - but only if it is current. So, before using any skill, in this order:
 
-1. `skill {}` (or `skill {"slugs":["<slug>"]}`) - read the published version.
-2. **Installed here at the same version?** Read the local SKILL.md from disk and follow it. Do not call the gateway skill tool.
-3. **Not installed, or a different version?** Install it now, in this same turn, before continuing the task.
+1. **Do I already have it?** Check wherever your client keeps skills: your skills directories on a filesystem client, your saved skills on Claude Desktop or Cowork. An existing copy carries `<!-- fastn skill: <slug> v<N> -->`, so its version is readable without calling anything.
+2. **What is published?** `skill {"slugs":["<slug>"]}` - one cheap call, and it returns the current version. (`skill {}` also works when you still need to pick which skill.)
+3. **Same version?** Use the copy you already have and follow it. Do not re-read the skill through the gateway.
+4. **Missing, or a different version?** Download and save it now, in this same turn, before continuing the task.
 
-Any version difference triggers a reinstall, even when the body looks unchanged - a reference file may have changed. The version number is the source of truth, not the visible text.
+Any version difference triggers a re-download, even when the body looks unchanged - a reference file may have changed. The version number is the source of truth, not the visible text.
 
-### Install it
+Never skip step 1 and re-download something you already have at the right version, and never skip steps 2 to 4 and start the user's task with no copy saved.
+
+Installing is two separate steps, and **which client you are does not change the first one**.
+
+#### Step 1: download the zip. Always, on every client.
 
 `downloadUrl` (from `skill {}` or `skill {"slug":"x"}`) serves the complete skill as a zip - `<slug>/SKILL.md` plus `references/`. Plain GET, no auth header, valid ~15 minutes, multi-use; re-list for a fresh link.
 
-**Filesystem clients (Claude Code, Copilot CLI, anything that can write files)** - unzip into a persistent skills directory. That IS the install; do not build a `.skill` file:
-
 ```
 curl -sSL "<downloadUrl>" -o /tmp/<slug>.zip
-unzip -o /tmp/<slug>.zip -d .claude/skills/
+unzip -o /tmp/<slug>.zip -d /tmp/<slug>/
 ```
 
-**Always try this first.** The zip is the whole skill in one request - verbatim by construction and effectively free. Rebuilding the same files from `skill {"slug":...}` + `{"ref":...}` responses costs hundreds of times more tokens and can drift from the published text, so treat it strictly as a fallback for when the download genuinely cannot run (no `downloadUrl`, or the request is blocked). If you do fall back, copy every file verbatim and still install all of them.
+Any client that can run a command can do this, **including sandboxed app clients like Claude Cowork**. "My client has no persistent skills directory" is a reason to persist differently in step 2, never a reason to skip the download.
 
-- Default to project-level `.claude/skills/`. Claude Code and Copilot CLI both read it. (Copilot CLI also reads `.github/skills/` and `.agents/skills/`.)
-- Personal alternative: `~/.claude/skills/` (Claude Code) or `~/.copilot/skills/` (Copilot CLI).
-- A session temp or scratch directory is NOT an install - it disappears with the session.
+The zip is the whole skill in one request - verbatim by construction and effectively free. **Never hand-write, paraphrase, summarize, or reconstruct a skill you could have downloaded.** Rebuilding it from `skill {"slug":...}` + `{"ref":...}` responses costs hundreds of times more tokens and drifts from the published text, so treat that strictly as a fallback for when the download genuinely cannot run (no `downloadUrl`, or the request is blocked). If you do fall back, copy every file word for word.
 
-Then, in order:
+Then **stamp the version** into the downloaded `SKILL.md`, immediately after the closing `---` of the YAML frontmatter - never above it, or the file fails to load:
 
-1. **Stamp the version** into the installed `SKILL.md`, immediately after the closing `---` of the YAML frontmatter - never above it, or the file fails to load:
+```
+<!-- fastn skill: <slug> v<N> -->
 
-   ```
-   <!-- fastn skill: <slug> v<N> -->
+> Step 0 - version sync (do this FIRST, every run): this file is tagged `<!-- fastn skill: <slug> v<N> -->`. Call `skill {"slugs": ["<slug>"]}` and compare. If the published version differs, reinstall from the fresh `downloadUrl` before doing anything else.
+```
 
-   > Step 0 - version sync (do this FIRST, every run): this file is tagged `<!-- fastn skill: <slug> v<N> -->`. Call `skill {"slugs": ["<slug>"]}` and compare. If the published version differs, reinstall from the fresh `downloadUrl` before doing anything else.
-   ```
+#### Step 2: persist the downloaded files where YOUR client reads skills from
 
-2. **Reload** so the client registers it. Copilot CLI: `/skills reload`, verify with `/skills info <slug>`. Claude Code picks up changes inside an EXISTING watched skills directory automatically - but if you had to create that directory just now, it was not being watched, so tell the user to restart the client.
-3. **Read the installed SKILL.md from disk now.** A skill installed mid-session is usually not yet invocable by slug in that session, so use the file you just wrote for the current task. Installing is not a substitute for reading it.
-4. Tell the user the exact directory it landed in.
+| Client | Persist to |
+|---|---|
+| Claude Code | `.claude/skills/` (project) or `~/.claude/skills/` (personal) |
+| Copilot CLI | `.claude/skills/`, `.github/skills/`, or `.agents/skills/` (project), or `~/.copilot/skills/` (personal). Then `/skills reload`, verify with `/skills info <slug>` |
+| Claude Desktop, Claude Cowork | Skills live in the user's claude.ai account, not on disk (Cowork syncs that set at session start). Use your client's own save-a-skill capability on the files you just downloaded, or hand the user the zip to add in claude.ai settings |
 
-**App clients with no writable skills directory (Claude Desktop, Claude Cowork):** these load skills from the user's claude.ai account, not from disk, and Cowork syncs that set at session start. Hand the user the `downloadUrl` and tell them to add the skill under claude.ai Settings, then reload. Never tell the user you cannot update a skill.
+On a client with a skills directory, moving the unzipped folder there IS the whole install - there is no separate save command:
+
+```
+cp -R /tmp/<slug>/<slug> .claude/skills/
+```
+
+Equivalently, unzip straight to the destination in step 1 (`unzip -o /tmp/<slug>.zip -d .claude/skills/`) and skip the copy.
+
+**`save_skill` is not persistence.** It PUBLISHES a skill into your organization's shared fastn library (owner/admin only). Calling it to "save" a skill you merely read republishes that skill org-wide. Persisting a copy for yourself is always a client-side action.
+
+A session temp or scratch directory is NOT persistence - it disappears with the session. Downloading to `/tmp` and stopping there means the skill is not installed.
+
+Finally:
+
+- **Read the SKILL.md you just downloaded, now.** A skill persisted mid-session is usually not yet invocable by slug in that session, so use the file itself for the current task. Installing is not a substitute for reading it.
+- Claude Code picks up changes inside an EXISTING watched skills directory automatically. If you had to create that directory just now, it was not being watched, so tell the user to restart the client.
+- Tell the user exactly where it landed. Never tell the user you cannot update a skill.
 
 ### Rules
 
-- Fetching is not installing. Fetching gives you content for now; installing persists it for later runs. Both are required.
-- The downloaded zip IS the verbatim skill - installing its files unchanged satisfies the verbatim requirement. If you ever rebuild by hand instead (no `downloadUrl`), copy the body word-for-word: never paraphrase, summarize, reorder, or translate it. The version tag and Step 0 block are the only things you add.
-- A SKILL.md installed without all of its reference files is an incomplete install and counts as not installed. The zip already contains them; when rebuilding by hand, fetch each with `skill {"slug":"x","ref":"<doc>"}`.
-- Put the install/update in your task list as item #1 and block the user's request on it, so it cannot be skipped.
-- To update an already-installed skill on a filesystem client, overwrite its folder and reload. That is the update path.
+- Fetching is not installing. Fetching gives you content for now; persisting keeps it for later runs. Both are required.
+- The downloaded zip IS the verbatim skill - persisting its files unchanged satisfies the verbatim requirement. If you ever rebuild by hand instead (no `downloadUrl`), copy the body word-for-word: never paraphrase, summarize, reorder, or translate it. The version tag and Step 0 block are the only things you add.
+- A SKILL.md persisted without all of its reference files is an incomplete install and counts as not installed. The zip already contains them; when rebuilding by hand, fetch each with `skill {"slug":"x","ref":"<doc>"}`.
+- Put the install/update in your task list as item #1 and block the user's request on it, so it cannot be skipped. Do not start the user's task and install afterwards.
+- To update an already-installed skill, overwrite it with a fresh download and reload. That is the update path on every client.
 
 ### Applying a diff instead of a full reinstall
 

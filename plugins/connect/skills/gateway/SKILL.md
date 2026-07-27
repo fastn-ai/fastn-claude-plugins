@@ -1,11 +1,26 @@
 ---
 name: gateway
-description: How to work with the fastn integration gateway (connected as an MCP server by this plugin) - discover fastn's dynamically served library of skills with the `skill` tool, install a skill locally from its signed download link, keep the installed copy in sync with the published version, and follow the local copy instead of re-fetching it. Use whenever a task touches an external app, connector, integration, workflow, sync, or automation through fastn.
+description: How to work with the fastn integration gateway (connected as an MCP server by this plugin) - clear the gateway's required first read, discover fastn's dynamically served library of skills with the `skill` tool, install a skill locally from its signed download link, keep the installed copy in sync with the published version, and follow the local copy instead of re-fetching it. Use whenever a task touches an external app, connector, integration, workflow, sync, or automation through fastn.
 ---
 
 # fastn gateway
 
 This plugin connects the fastn gateway as an MCP server: one governed endpoint fronting every app your organization has connected, which also **dynamically serves fastn's library of skills** for building integrations (connectors, workflows, syncs, widgets) and running governed, multi-tenant automations. Skills are published and updated server-side, so always discover the current set rather than assuming what exists. Authentication, identity, and policy are handled by the gateway - there is nothing to configure.
+
+## First call, every time
+
+**Your first call on this gateway is `skill {"slugs":["gateway"]}`.**
+
+The gateway REFUSES every app tool (and `run_tool`) until this connection has read the `gateway` playbook. The refusal is a normal tool result that names the fix, so a missed step is recoverable, but it costs a wasted round trip. One probe avoids it and does two jobs at once: it clears the gate, and it tells you whether the copy you are reading right now is current.
+
+- Published version matches the `<!-- fastn skill: gateway vN -->` tag in this file? You already have the rules. Continue.
+- It differs, or this file carries no tag? Call `skill {"slug":"gateway"}`, follow what it returns, and reinstall per the install section below.
+
+A bare `skill {}` listing does **not** clear the gate: it returns descriptions, not rules. Only a read that touches the `gateway` playbook does.
+
+Some tools stay open so you are never stuck: `skill`, `capture_feedback`, `manage_connections`, and `search_tools`.
+
+If your client opens a fresh session per request, a read may not stick. The playbook read hands back a `_gw` token for exactly that case: pass `_gw: "<token>"` alongside a tool's own arguments and the call goes through.
 
 ## The `skill` tool
 
@@ -14,7 +29,7 @@ Skill discovery runs through a **single tool literally named `skill`**. Your cli
 - Claude Code / Claude apps: `mcp__fastn__skill`
 - GitHub Copilot CLI: `fastn-skill`
 
-There are no `list_skills`, `load_skill`, or `open_skill_reference` tools. If you go looking for those names you will not find them - **that does not mean the gateway is unavailable.** The gateway may expose 200+ other tools alongside it; `skill` is one entry in that list.
+It is the only skill tool in your list. The older `list_skills`, `load_skill`, and `open_skill_reference` names still route if something calls them, but they are not listed, so searching your tool list for them finds nothing. **That does not mean the gateway is unavailable** - the gateway may expose 200+ other tools alongside `skill`.
 
 Arguments select the action:
 
@@ -26,19 +41,18 @@ Arguments select the action:
 | `skill {"slug":"x","ref":"<doc>"}` | Open one named reference document |
 | `skill {"slug":"x","knownVersion":N,"toVersion":M}` | Per-file diff between two versions |
 | `skill {"slug":"x","history":true}` | Full change history |
+| `skill {"withScore":true}` | List view plus quality scores and stale referenced tools (authoring) |
 
 Reading never executes anything. To *run* a skill, call it by its slug like any other tool.
 
-## First call, every time
-
-**On any task touching an integration, connector, workflow, sync, widget, automation, or external app, your FIRST tool call is `skill {}`.** Match the task to a slug before doing anything else. Never tell the user the gateway is unavailable, and never hand-write an integration yourself, until `skill {}` has actually returned.
+**On any task touching an integration, connector, workflow, sync, widget, automation, or external app, match the task to a skill slug before doing anything else.** Never tell the user the gateway is unavailable, and never hand-write an integration yourself, until you have actually looked.
 
 ## Using the app tools
 
 - Treat the gateway as your first stop for any external app. Rely on your current tool list, not prior assumptions.
 - App tools are namespaced `app__action` (`slack__send_message`, `github__list_issues`). Call the exact name shown.
 - If a `search_tools` tool is present, use it to find one, then `run_tool` with the name it returns. If it is not present, the app tools are already listed directly in your tool list - use them there.
-- Assume accounts are connected and just call the tool. If one is not, the call returns a connect link - hand that link to the user.
+- Assume accounts are connected and just call the tool. If one is not, the call returns a connect link - hand that link to the user. `manage_connections` lists what is connected and mints connect links directly.
 - On a multi-step run, pass one short `_task` id on every call so the actions correlate.
 
 ## Install and version-sync (mandatory)
@@ -64,7 +78,7 @@ unzip -o /tmp/<slug>.zip -d .claude/skills/
 
 **Always try this first.** The zip is the whole skill in one request - verbatim by construction and effectively free. Rebuilding the same files from `skill {"slug":...}` + `{"ref":...}` responses costs hundreds of times more tokens and can drift from the published text, so treat it strictly as a fallback for when the download genuinely cannot run (no `downloadUrl`, or the request is blocked). If you do fall back, copy every file verbatim and still install all of them.
 
-- Default to project-level `.claude/skills/` - the only directory both Claude Code and Copilot CLI discover.
+- Default to project-level `.claude/skills/`. Claude Code and Copilot CLI both read it. (Copilot CLI also reads `.github/skills/` and `.agents/skills/`.)
 - Personal alternative: `~/.claude/skills/` (Claude Code) or `~/.copilot/skills/` (Copilot CLI).
 - A session temp or scratch directory is NOT an install - it disappears with the session.
 
@@ -78,11 +92,11 @@ Then, in order:
    > Step 0 - version sync (do this FIRST, every run): this file is tagged `<!-- fastn skill: <slug> v<N> -->`. Call `skill {"slugs": ["<slug>"]}` and compare. If the published version differs, reinstall from the fresh `downloadUrl` before doing anything else.
    ```
 
-2. **Reload** so the client registers it - Copilot CLI: `/skills reload`, verify with `/skills info <slug>`. Claude Code registers at session start.
+2. **Reload** so the client registers it. Copilot CLI: `/skills reload`, verify with `/skills info <slug>`. Claude Code picks up changes inside an EXISTING watched skills directory automatically - but if you had to create that directory just now, it was not being watched, so tell the user to restart the client.
 3. **Read the installed SKILL.md from disk now.** A skill installed mid-session is usually not yet invocable by slug in that session, so use the file you just wrote for the current task. Installing is not a substitute for reading it.
 4. Tell the user the exact directory it landed in.
 
-**App clients with no writable skills directory (Claude, Claude Cowork):** package the folder as a `.skill` zip and present that file - it renders a "Save skill" button. Saving a skill whose name already exists prompts the user to replace it, which is the update path there. Never tell the user you cannot update a skill.
+**App clients with no writable skills directory (Claude Desktop, Claude Cowork):** these load skills from the user's claude.ai account, not from disk, and Cowork syncs that set at session start. Hand the user the `downloadUrl` and tell them to add the skill under claude.ai Settings, then reload. Never tell the user you cannot update a skill.
 
 ### Rules
 

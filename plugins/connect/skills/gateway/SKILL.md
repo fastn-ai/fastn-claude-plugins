@@ -97,7 +97,7 @@ Then **stamp the version** into the downloaded `SKILL.md`, immediately after the
 |---|---|
 | Claude Code | `.claude/skills/` (project) or `~/.claude/skills/` (personal) |
 | Copilot CLI | `.claude/skills/`, `.github/skills/`, or `.agents/skills/` (project), or `~/.copilot/skills/` (personal). Then `/skills reload`, verify with `/skills info <slug>` |
-| Claude Desktop, Claude Cowork | Skills live in the user's claude.ai account, not on disk (Cowork syncs that set at session start). Use your client's own save-a-skill capability on the files you just downloaded, or hand the user the zip to add in claude.ai settings |
+| Claude Desktop, Claude Cowork, claude.ai | Skills live in the user's claude.ai account, not on disk, and sync across Claude surfaces. **The zip you just downloaded is already in the required upload shape** (`<slug>/SKILL.md` at the zip root), so hand it to the user and tell them: **Customize > Skills > Add**, upload the zip. Needs Code Execution on under Settings > Capabilities. In Cowork you can also surface the downloaded files as a skill for the user to save |
 
 On a client with a skills directory, moving the unzipped folder there IS the whole install - there is no separate save command:
 

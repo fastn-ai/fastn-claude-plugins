@@ -81,6 +81,8 @@ unzip -o /tmp/<slug>.zip -d /tmp/<slug>/
 
 Any client that can run a command can do this, **including sandboxed app clients like Claude Cowork**. "My client has no persistent skills directory" is a reason to persist differently in step 2, never a reason to skip the download.
 
+On a sandboxed client, `/tmp` is inside the sandbox VM, not on the user's disk. If step 2 needs the user to open the file themselves, write it into the session's **working folder** (the attached folder) instead, or they cannot reach it.
+
 The zip is the whole skill in one request - verbatim by construction and effectively free. **Never hand-write, paraphrase, summarize, or reconstruct a skill you could have downloaded.** Rebuilding it from `skill {"slug":...}` + `{"ref":...}` responses costs hundreds of times more tokens and drifts from the published text, so treat that strictly as a fallback for when the download genuinely cannot run (no `downloadUrl`, or the request is blocked). If you do fall back, copy every file word for word.
 
 Then **stamp the version** into the downloaded `SKILL.md`, immediately after the closing `---` of the YAML frontmatter - never above it, or the file fails to load:
@@ -97,7 +99,7 @@ Then **stamp the version** into the downloaded `SKILL.md`, immediately after the
 |---|---|
 | Claude Code | `.claude/skills/` (project) or `~/.claude/skills/` (personal) |
 | Copilot CLI | `.claude/skills/`, `.github/skills/`, or `.agents/skills/` (project), or `~/.copilot/skills/` (personal). Then `/skills reload`, verify with `/skills info <slug>` |
-| Claude Desktop, Claude Cowork, claude.ai | Skills live in the user's claude.ai account, not on disk, and sync across Claude surfaces. **The zip you just downloaded is already in the required upload shape** (`<slug>/SKILL.md` at the zip root), so hand it to the user and tell them: **Customize > Skills > Add**, upload the zip. Needs Code Execution on under Settings > Capabilities. In Cowork you can also surface the downloaded files as a skill for the user to save |
+| Claude Desktop, Claude Cowork, claude.ai | Skills live in the user's claude.ai account, not on disk, and sync across Claude surfaces. If your **own** tool list exposes a skill-saving tool (Cowork has one), calling it IS the install - pass it the files you just downloaded, never text you wrote yourself. If it does not, fall back to the zip, which is already in the required upload shape (`<slug>/SKILL.md` at the zip root): write it into the working folder so the user can reach it, then tell them **Customize > Skills > Add**. Needs Code Execution on under Settings > Capabilities |
 
 On a client with a skills directory, moving the unzipped folder there IS the whole install - there is no separate save command:
 
@@ -107,7 +109,7 @@ cp -R /tmp/<slug>/<slug> .claude/skills/
 
 Equivalently, unzip straight to the destination in step 1 (`unzip -o /tmp/<slug>.zip -d .claude/skills/`) and skip the copy.
 
-**`save_skill` is not persistence.** It PUBLISHES a skill into your organization's shared fastn library (owner/admin only). Calling it to "save" a skill you merely read republishes that skill org-wide. Persisting a copy for yourself is always a client-side action.
+**Two different tools share the name `save_skill`. Check which list yours came from.** The one in your **fastn** tool list PUBLISHES into your organization's shared fastn library (owner/admin only), so calling it to "save" a skill you merely read republishes that skill org-wide. Your **client** may expose its own, separate save-skill tool - that one is real personal persistence, and on Claude surfaces it is the correct call. Whichever you use, feed it the downloaded files verbatim.
 
 A session temp or scratch directory is NOT persistence - it disappears with the session. Downloading to `/tmp` and stopping there means the skill is not installed.
 

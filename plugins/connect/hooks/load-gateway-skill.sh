@@ -42,7 +42,10 @@ body="$(awk 'fence>=2 {print; next} /^---[[:space:]]*$/ {fence++}' "$skill")"
 # a skill is installed, and leaves it one cheap `skill {"slugs":[...]}` call from knowing
 # whether the local copy is stale. The hook cannot ask the gateway itself (that needs OAuth).
 inventory=""
-for dir in "${PWD}/.claude/skills" "${HOME}/.claude/skills" "${HOME}/.copilot/skills"; do
+for dir in \
+  "${PWD}/.claude/skills" "${HOME}/.claude/skills" \
+  "${PWD}/.github/skills" "${PWD}/.agents/skills" "${HOME}/.copilot/skills" \
+  "${PWD}/.codex/skills" "${HOME}/.codex/skills"; do
   [ -d "$dir" ] || continue
   for md in "$dir"/*/SKILL.md; do
     [ -f "$md" ] || continue
@@ -61,9 +64,9 @@ if [ -n "$inventory" ]; then
 ${inventory}
 Before using any of these, call \`skill {\"slugs\": [...]}\` once with their slugs and compare versions. Same version -> read the local copy from disk and follow it. Different version, or the skill you need is not listed above -> install it first, as the install section requires."
 else
-  inventory="## fastn skills already installed here (scanned at session start - authoritative)
+  inventory="## fastn skills already installed here (scanned at session start)
 
-None. No skill has been installed from the gateway in this environment yet, so any skill you need must be discovered with \`skill {}\` and installed before use."
+Nothing found in the directories this scan can see. That is not proof nothing is installed: it cannot see a client's account-level skill store, and on a client whose working directory is chosen per session it may be looking in the wrong place. Treat it as \"unknown\", not \"none\" - check the skills directory for YOUR client (see the install table) before concluding you must reinstall."
 fi
 
 # A short lead line makes the rules unambiguous; the body is the plugin skill verbatim.

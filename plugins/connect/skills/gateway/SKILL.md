@@ -50,7 +50,9 @@ Setup:
 - [ ] 2. Pick the skill(s) this task needs
 - [ ] 3. Version check: skill {"slugs":["<slug>"]}
 - [ ] 4. Installed at the same version? Skip to 5. Otherwise install now.
-- [ ] 5. Read the installed SKILL.md, then its references as each phase needs them
+- [ ] 5. Claude Desktop / Cowork only: present the `.skill` file for EVERY skill loaded,
+         including `gateway`, and tell the user to click Save skill
+- [ ] 6. Read the installed SKILL.md, then its references as each phase needs them
 ```
 
 Step 3 is one cheap call. An installed copy carries `<!-- fastn skill: <slug> v<N> -->`, so compare that tag against what the probe returns. Any version difference means reinstall, even if the body looks identical, because a reference file may have changed. The version number is the source of truth, not the visible text.
@@ -62,27 +64,44 @@ Do not skip step 3 and reinstall what you already have. Do not skip steps 3 to 5
 `downloadUrl` comes from `skill {}` or `skill {"slug":"x"}` and serves the complete skill as a zip (`<slug>/SKILL.md` plus `references/`). Plain GET, no auth header, **valid about 15 minutes**, so mint it immediately before you download. If a download 403s or reports an expired token, re-read for a fresh link rather than retrying the old one.
 
 ```bash
-mkdir -p <skills-dir> && curl -sSL "<downloadUrl>" -o /tmp/<slug>.zip && unzip -o /tmp/<slug>.zip -d <skills-dir>/
+curl -sSL "<downloadUrl>" -o /tmp/<slug>.zip && unzip -o /tmp/<slug>.zip -d /tmp/
 ```
 
-That single command IS the install. Nothing else is required, and there is no separate save step.
-
-Only `<skills-dir>` varies:
-
-| Client | `<skills-dir>` |
-|---|---|
-| Claude Code | `.claude/skills` (project) or `~/.claude/skills` (personal) |
-| Claude Desktop / Cowork | `.claude/skills` **inside your working folder**. You have a real filesystem there; use it |
-| Copilot CLI | `.claude/skills`, `.github/skills`, or `.agents/skills` (project), or `~/.copilot/skills` (personal). Then `/skills reload`, verify with `/skills info <slug>` |
-| Codex CLI | `.codex/skills` (project) or `~/.codex/skills` (personal) |
-
-Then **stamp the version** into the installed `SKILL.md`, immediately after the closing `---` of the frontmatter, never above it or the file fails to load:
+Then **stamp the version** into `/tmp/<slug>/SKILL.md`, immediately after the closing `---` of the frontmatter, never above it or the file fails to load:
 
 ```
 <!-- fastn skill: <slug> v<N> -->
 
 > Step 0 - version sync (do this FIRST, every run): this file is tagged `<!-- fastn skill: <slug> v<N> -->`. Call `skill {"slugs": ["<slug>"]}` and compare. If the published version differs, reinstall from the fresh `downloadUrl` before doing anything else.
 ```
+
+Now persist it. **Where a skill survives the session differs by client, and getting this wrong is the most common way an install silently does nothing.**
+
+### Claude Desktop and Claude Cowork: build a `.skill` file
+
+Skills live in the user's claude.ai account, not on disk. Re-zip the stamped folder with a `.skill` extension and present that file:
+
+```bash
+cd /tmp && zip -qr <slug>.skill <slug>
+```
+
+Presenting a `.skill` file renders a **Save skill** button. The user clicks it once and the skill is in their account: it persists across sessions, syncs across Claude surfaces, and carries `references/` with it. Saving a skill whose name already exists prompts the user to replace it, which is the update path here.
+
+**This is mandatory, not a suggestion.** On these clients you have not installed anything until the `.skill` file is presented. Present one for **every** skill you loaded, the `gateway` playbook included, and tell the user explicitly to click Save skill on each card. Do not continue with the task and offer it afterwards, and never end a turn having read a skill without presenting its `.skill` file.
+
+**Do not unzip into `.claude/skills` on these clients.** Unless the user has connected a working folder, that path is session scratch: it looks like a successful install and is gone next session. Even with a folder connected, the `.skill` file is what persists into the account, so present it either way.
+
+### Claude Code, Copilot CLI, Codex CLI: move the folder into the skills directory
+
+```bash
+mkdir -p <skills-dir> && cp -R /tmp/<slug> <skills-dir>/
+```
+
+| Client | `<skills-dir>` |
+|---|---|
+| Claude Code | `.claude/skills` (project) or `~/.claude/skills` (personal) |
+| Copilot CLI | `.claude/skills`, `.github/skills`, or `.agents/skills` (project), or `~/.copilot/skills` (personal). Then `/skills reload`, verify with `/skills info <slug>` |
+| Codex CLI | `.codex/skills` (project) or `~/.codex/skills` (personal) |
 
 Finally:
 
@@ -97,13 +116,13 @@ Finally:
 - A session temp or scratch directory is not persistence. Downloading to `/tmp` and stopping there means the skill is not installed.
 - To update, overwrite with a fresh download and reload. Same command.
 
-### Wanting a copy in your account as well (Claude surfaces)
+### Two things that are NOT installing
 
-Optional, and never a substitute for the command above. Hand the user the zip you downloaded (it is already the required upload shape) and tell them: **Customize > Skills > Add**, which needs Code Execution on under Settings > Capabilities. This is the only account-level path that preserves `references/`.
+**A client's own save-skill tool** may accept only a single SKILL.md body, which **loses every reference file**. The `.skill` file carries them; that tool may not. Use it only for a skill with no references, and say what was dropped if you use it anyway.
 
-If your client offers its own save-skill tool, note that it may accept only a single SKILL.md body, which **loses every reference file**. Use it only for a skill that has no references, and say what was dropped if you use it anyway.
+**The gateway's own `save_skill`** PUBLISHES into your organization's shared library (owner/admin only). Calling it to "save" a skill you merely read republishes that skill org-wide.
 
-**The gateway's own `save_skill` is not this.** It PUBLISHES into your organization's shared library (owner/admin only). Calling it to "save" a skill you merely read republishes that skill org-wide.
+Manual upload via **Customize > Skills > Add** also works if the user prefers it (the zip is already the right shape, and it needs Code Execution on under Settings > Capabilities), but the `.skill` button is one click and does the same thing.
 
 ## The `skill` tool
 

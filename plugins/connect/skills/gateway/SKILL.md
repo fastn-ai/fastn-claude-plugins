@@ -63,11 +63,19 @@ Do not skip step 3 and reinstall what you already have. Do not skip steps 3 to 5
 
 `downloadUrl` comes from `skill {}` or `skill {"slug":"x"}` and serves the complete skill as a zip (`<slug>/SKILL.md` plus `references/`). Plain GET, no auth header, **valid about 15 minutes**, so mint it immediately before you download. If a download 403s or reports an expired token, re-read for a fresh link rather than retrying the old one.
 
+Work in ONE writable directory for the whole install and never mix it with another. **Do not use `/tmp`**: it is read-only in some sandboxes (Cowork among them), where every write fails with `Permission denied` and the install falls apart mid-way. Use your working folder, or the current directory. Set it once:
+
 ```bash
-curl -sSL "<downloadUrl>" -o /tmp/<slug>.zip && unzip -o /tmp/<slug>.zip -d /tmp/
+D="$(pwd)"                       # your working folder if you have one, else any writable dir
+curl -fsSL "<downloadUrl>" -o "$D/<slug>.zip" && unzip -oq "$D/<slug>.zip" -d "$D"
+ls "$D/<slug>" && ls "$D/<slug>/references"
 ```
 
-Then **stamp the version** into `/tmp/<slug>/SKILL.md`, immediately after the closing `---` of the frontmatter, never above it or the file fails to load:
+**Keep the `-f` on curl.** Without it a 403 or an expired link is written into the `.zip` as an error page and curl still exits 0, so the unzip fails on garbage and everything after it improvises.
+
+**That last `ls` is not optional.** It must show `SKILL.md` and a non-empty `references/`. If `references/` is missing you have a broken copy: do not continue, re-download. Splitting these steps across different directories, or unzipping with `-j`, flattens the folder into a loose `SKILL.md` and silently drops every reference.
+
+Then **stamp the version** into `$D/<slug>/SKILL.md`, immediately after the closing `---` of the frontmatter, never above it or the file fails to load:
 
 ```
 <!-- fastn skill: <slug> v<N> -->
@@ -82,19 +90,29 @@ Now persist it. **Where a skill survives the session differs by client, and gett
 Skills live in the user's claude.ai account, not on disk. Re-zip the stamped folder with a `.skill` extension and present that file:
 
 ```bash
-cd /tmp && zip -qr <slug>.skill <slug>
+cd "$D" && zip -qr <slug>.skill <slug> && unzip -l <slug>.skill
+```
+
+**Read that listing before you present anything.** It must contain `<slug>/SKILL.md` and every `<slug>/references/*` file. A `.skill` holding one file is a broken install that looks finished: the skill loads next session and every procedure that opens a reference fails.
+
+If `zip` is unavailable, build it with Python instead, then run the same check:
+
+```bash
+cd "$D" && python3 -c "import shutil;shutil.make_archive('<slug>.skill','zip','.','<slug>')" && mv <slug>.skill.zip <slug>.skill && unzip -l <slug>.skill
 ```
 
 Presenting a `.skill` file renders a **Save skill** button. The user clicks it once and the skill is in their account: it persists across sessions, syncs across Claude surfaces, and carries `references/` with it. Saving a skill whose name already exists prompts the user to replace it, which is the update path here.
+
+**Do both, in this order.** If your own tool list has a save-skill tool, call it too, passing the SKILL.md body: that puts the skill in the account immediately with nothing for the user to click. It may accept only a single body and drop `references/`, which is exactly why the `.skill` card is still required rather than optional. So: call your save-skill tool, **then** present the `.skill` file, then tell the user to click Save skill on it.
 
 **This is mandatory, not a suggestion.** On these clients you have not installed anything until the `.skill` file is presented. Present one for **every** skill you loaded, the `gateway` playbook included, and tell the user explicitly to click Save skill on each card. Do not continue with the task and offer it afterwards, and never end a turn having read a skill without presenting its `.skill` file.
 
 **Do not unzip into `.claude/skills` on these clients.** Unless the user has connected a working folder, that path is session scratch: it looks like a successful install and is gone next session. Even with a folder connected, the `.skill` file is what persists into the account, so present it either way.
 
-### Claude Code, Copilot CLI, Codex CLI: move the folder into the skills directory
+### Claude Code, Copilot CLI, Codex CLI: move the folder into the skills directory (Check your identity first)
 
 ```bash
-mkdir -p <skills-dir> && cp -R /tmp/<slug> <skills-dir>/
+mkdir -p <skills-dir> && cp -R "$D/<slug>" <skills-dir>/
 ```
 
 | Client | `<skills-dir>` |

@@ -19,7 +19,11 @@ If your client opens a fresh session per request, the read may not stick. The re
 
 ## Decide before you act
 
-**Do not call app or platform tools to "look around" first.** Raw tool calls before a plan produce half-built work that has to be redone. In order:
+**Do not call app or platform tools to "look around" first.** Raw tool calls before a plan produce half-built work that has to be redone.
+
+**This is enforced, not advice.** The gateway refuses your first app or platform call if this connection has not loaded a skill for the task, and the refusal lists the ones available. It fires once per connection, so a task that genuinely needs no skill just retries. Treat loading the matching skill as a blocking step, not a background task on your list: putting it on the list and doing the work first is exactly the failure this refusal exists to catch.
+
+In order:
 
 1. **Does this task need a skill?** Anything touching an integration, connector, workflow, sync, widget, automation, or external app: yes.
 2. **Which skill?** Match the task with the routing table below. If unsure, `skill {}` and read the descriptions.

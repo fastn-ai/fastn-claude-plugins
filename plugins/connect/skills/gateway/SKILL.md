@@ -59,7 +59,7 @@ Step 3 is one cheap call. An installed copy carries `<!-- fastn skill: <slug> v<
 
 Do not skip step 3 and reinstall what you already have. Do not skip steps 3 to 5 and start the task with nothing installed.
 
-## Install: one command
+## Install: download, stamp, persist
 
 `downloadUrl` comes from `skill {}` or `skill {"slug":"x"}` and serves the complete skill as a zip (`<slug>/SKILL.md` plus `references/`). Plain GET, no auth header, **valid about 15 minutes**, so mint it immediately before you download. If a download 403s or reports an expired token, re-read for a fresh link rather than retrying the old one.
 
@@ -103,7 +103,14 @@ cd "$D" && python3 -c "import shutil;shutil.make_archive('<slug>.skill','zip','.
 
 Presenting a `.skill` file renders a **Save skill** button. The user clicks it once and the skill is in their account: it persists across sessions, syncs across Claude surfaces, and carries `references/` with it. Saving a skill whose name already exists prompts the user to replace it, which is the update path here.
 
-**Do both, in this order.** If your own tool list has a save-skill tool, call it too, passing the SKILL.md body: that puts the skill in the account immediately with nothing for the user to click. It may accept only a single body and drop `references/`, which is exactly why the `.skill` card is still required rather than optional. So: call your save-skill tool, **then** present the `.skill` file, then tell the user to click Save skill on it.
+**Whether to also call your own save-skill tool depends on one thing: does the skill have references?** Decide by looking, not by guessing, using the `unzip -l` listing you just ran.
+
+| The skill's `.skill` contains | Do |
+|---|---|
+| SKILL.md **and** `references/*` | **Card only.** Do NOT call your save-skill tool: it takes a single body, so it would store a copy missing every reference, which looks installed until a procedure opens one |
+| SKILL.md only, no `references/` | **Call your save-skill tool AND present the card.** Nothing can be lost, and the tool call installs it with no click needed |
+
+Either way the card is presented. The tool is an extra, never a replacement.
 
 **This is mandatory, not a suggestion.** On these clients you have not installed anything until the `.skill` file is presented. Present one for **every** skill you loaded, the `gateway` playbook included, and tell the user explicitly to click Save skill on each card. Do not continue with the task and offer it afterwards, and never end a turn having read a skill without presenting its `.skill` file.
 

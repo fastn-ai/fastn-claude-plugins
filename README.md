@@ -53,7 +53,7 @@ Keep `plugin.json` and `plugins/connect/.claude-plugin/plugin.json` in sync (sam
 `plugins/connect/.mcp.json` points at the fastn gateway:
 
 ```json
-{ "fastn": { "type": "http", "url": "https://connect.fastn.dev/mcp" } }
+{ "fastn": { "type": "http", "url": "https://mcp.fastn.dev/mcp" } }
 ```
 
 Set `url` to the endpoint your organization should hit (your org's gateway, or the default production endpoint) before distributing. This is the only configuration.

@@ -1,6 +1,6 @@
 {
   "fastn": {
     "type": "http",
-    "url": "https://connect.fastn.dev/mcp"
+    "url": "https://mcp.fastn.dev/mcp"
   }
 }

@@ -53,7 +53,7 @@ tools are available in the session.
 
 Inside a Copilot session:
 
-- `/mcp` should list the `fastn` server under Plugins, pointing at `https://mcp.fastn.dev/mcp`
+- `/mcp` should list the `fastn` server under Plugins, pointing at `https://mcp.fastn.dev`
 - Ask: `do you see the fastn gateway mandatory usage rules?` and the agent should confirm and quote them
 - `/skills info gateway` shows the bundled gateway skill
 - Ask: `list the fastn skills` — the agent should call the `fastn-skill` tool with `{}` and return the published slugs and versions

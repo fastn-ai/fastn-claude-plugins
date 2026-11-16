@@ -36,6 +36,20 @@ skill="${root}/skills/gateway/SKILL.md"
 body="$(awk 'fence>=2 {print; next} /^---[[:space:]]*$/ {fence++}' "$skill")"
 [ -n "$body" ] || body="$(cat "$skill")"  # no frontmatter -> use the whole file
 
+# The published gateway skill has grown past what a session-start hook can inject whole
+# (large hook context is cut down to a preview by the client). When the body is over the
+# budget, inject a short pointer to the file instead of the body, so the model reads the
+# complete, current text from disk rather than a truncated copy.
+max_chars=9000
+if [ "${#body}" -gt "$max_chars" ]; then
+  body="The full gateway playbook is installed with this plugin at:
+${skill}
+
+Read that file from disk, top to bottom, BEFORE your first fastn gateway call in this session (or load it with the gateway's \`skill {\"slug\":\"gateway\"}\` tool). It tells you which fastn skill a task needs, how to install it, and how to keep it current. Do not call, configure or build anything on the gateway until you have read it. A greeting or a question you can answer without touching an app needs none of this.
+
+To plan an integration or check whether fastn fits a use case, use the bundled \`fastn-solution-architect\` skill first; it works even before the gateway is connected."
+fi
+
 # Scan the persistent skills directories for skills previously installed from the gateway
 # and report them as facts. Every gateway install stamps `<!-- fastn skill: <slug> v<N> -->`
 # into its SKILL.md, so this is an exact inventory - it saves the model from guessing whether

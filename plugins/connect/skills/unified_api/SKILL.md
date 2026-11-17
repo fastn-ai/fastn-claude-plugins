@@ -112,7 +112,7 @@ export default async function (ctx) {
 
   // Get / create (single provider; pass provider when several are connected)
   const one = await fastn.unified.crm.contact.get("93763152725", { provider: "hubspot" });
-  const created = await fastn.unified.crm.contact.create({ email: "a@x.com", first_name: "Ada" }, { provider: "hubspot" });
+  const created = await fastn.unified.crm.contact.create({ email: "ada@example.com", first_name: "Ada" }, { provider: "hubspot" });
   return { page, byProvider, one, created };
 }
 ```

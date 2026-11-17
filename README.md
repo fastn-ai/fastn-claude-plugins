@@ -114,6 +114,13 @@ Installing straight from the repository also works, because the repo root carrie
 copilot plugin install fastn-ai/fastn-claude-plugins
 ```
 
+**Other AI tools (Codex, Cursor, GitHub Copilot in the CLI and IDEs, the Claude apps)**
+
+The `fastn-solution-architect` skill is a standard Agent Skills folder, so the same folder works in
+these tools too: copy `plugins/connect/skills/fastn-solution-architect/` into the folder your tool reads
+(for Codex, Cursor and Copilot CLI that is `~/.agents/skills/`), then add the fastn MCP server.
+Step-by-step instructions per tool are in [docs/install-other-agents.md](docs/install-other-agents.md).
+
 ## License
 
 MIT - see [LICENSE](LICENSE).

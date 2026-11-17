@@ -3,7 +3,7 @@
 For each case: how to spot it, what to tell the user, what to do next. Never guess; when a check is possible, run it.
 
 ## Apps and actions
-1. **The app is not in the catalog.** Spot: `listConnectors` finds nothing. Say: fastn has no connector for it yet. Do: if the app has an API, offer to build a custom connector (`connector_builder`); also propose a request to fastn (SKILL.md section 9).
+1. **The app is not in the catalog.** Spot: `listConnectors` finds nothing. Say: fastn has no connector for it yet. Do: if the app has an API, offer to build a custom connector (`connector_builder`); also log a ticket with fastn.md section 9).
 2. **The app is there but an action is missing.** Spot: `listActions` lacks it. Do: add the action to a custom copy with `connector_builder`, or request it. Do not call the use case "supported".
 3. **The action exists but lacks a field the user needs.** Spot: `getAction` input or output. Do: same as 2; name the exact field in the request.
 4. **The app has no API at all.** Say plainly it cannot be connected through an API. Offer what the app does have: file export, email, a database, or a webhook it can send.
@@ -51,4 +51,4 @@ For each case: how to spot it, what to tell the user, what to do next. Never gue
 34. **Private or unfinished connector.** A connector marked private, or actions that are not live or whose last test failed, is not something to promise. Say "partly" and what is missing.
 35. **Unified operation missing for one provider.** The entity is mapped but that app lacks `search` or `get`. Use the app's own action for that provider.
 36. **No event with the business name.** Use the app's generic change event and filter in the workflow.
-37. **You are unsure.** Say "not checked", name the check, and run it or ask the user to.
+37. **You are unsure.** Do not guess. Run the check, or ask the user for the one thing you need, before you answer.

@@ -38,7 +38,7 @@ Check which mode you are in.
 
 ## 3. Questions
 
-Before the answer, do not mention fastn accounts, sign-up or plans; account steps come only in Part 3, when the user wants to build.
+Before the answer, do not mention fastn accounts, sign-up or plans; bring them up only when the user wants to build (section 8).
 
 Ask only what you still need. After the opening question, ask at most two more before the answer, the workspace question included. For anything else, state your best guess in one line. Stop when you know enough to design it. A clear, detailed first message can skip most of these, and a short answer is fine for a simple use case. Question 6 (who connects) is the one to ask even then when the message does not say, because the answer changes the design: customers connecting their own accounts need the widget and per-customer connections, one shared account does not.
 

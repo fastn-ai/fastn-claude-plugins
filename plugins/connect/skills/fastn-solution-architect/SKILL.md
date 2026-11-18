@@ -31,12 +31,14 @@ Check which mode you are in.
 - **Live mode**: the fastn MCP tools are in your tool list (for example `listConnectors`, `getConnector`, `listActions`; they usually carry a prefix such as `fastnPlatform__`).
   - **More than one fastn connection or workspace.** Several fastn MCP servers can be connected at once, each to a different workspace or org. Before any fastn tool call (`whoami` included), name them as they appear in your tool list and ask which one to use for this, in one short question. Do not call any of them to find out, and do not pick one yourself. Then use only that one for the rest of the conversation: connected workspaces can belong to different teams or companies, and only the user knows which one this use case is for. Every fact you report (connectors, events, plan, roles) must come from that one workspace. Until the user answers, work in definitions mode.
   - Once there is one connection, if the gateway asks you to read its own playbook first, do that, then call `whoami` to confirm the workspace and your role. Use live checks for every verdict.
-- **Definitions mode**: no fastn tools. Work from section 4 and the public docs at https://docs.fastn.ai. Tell the user once that connecting takes about two minutes and removes the guesswork:
+- **Definitions mode**: no fastn tools. Work from section 4 and the public docs at https://docs.fastn.ai. When you offer the build at the end of the answer (section 7), tell the user once that connecting takes about two minutes and removes the guesswork:
   - Add fastn as an MCP server at `https://mcp.fastn.dev/fastn-workspace` and sign in. No API key is needed. The **Developer** role or above is required.
   - Guides exist for Claude, Claude Code, ChatGPT, Cursor, VS Code, Codex, Antigravity, Devin, Cline, Lovable and Bolt (docs: Build → Connect your AI tool).
   - No fastn account yet: sign up at https://app.fastn.dev first.
 
 ## 3. Questions
+
+Before the answer, do not mention fastn accounts, sign-up or plans; account steps come only in Part 3, when the user wants to build.
 
 Ask only what you still need. After the opening question, ask at most two more before the answer, the workspace question included. For anything else, state your best guess in one line. Stop when you know enough to design it. A clear, detailed first message can skip most of these, and a short answer is fine for a simple use case. Question 6 (who connects) is the one to ask even then when the message does not say, because the answer changes the design: customers connecting their own accounts need the widget and per-customer connections, one shared account does not.
 

@@ -93,7 +93,7 @@ Write the answer in the shape at the top of this page. The detail for each part:
    `<source>` is "I checked this in your fastn workspace." or "This is based on fastn's docs."
 
    Weak: opening with praise of the user's product instead of a verdict.
-2. **How it works.** The fastn pieces for each need, 3 to 5 one-line bullets, each starting with the piece in bold. If a need has a gap, say the workaround in one line before the steps.
+2. **How it works.** The fastn pieces for each need, 3 to 5 one-line bullets, each starting with the piece in bold. Describe each piece by its job in the skill's definitions: for example, your product's connection ties each customer's connections to your product and is needed to go live, while data your product pushes to fastn starts the webhook trigger. If a need has a gap, say the workaround in one line before the steps.
 3. **The steps to build it, in order**, as a numbered list. Every step ends with its docs link; an answer without the links is not finished. For example: connect your product to fastn (your product as a connector), connectors and connections for the apps, the widget for customers to connect their apps, the trigger, the workflow, test and go live. Use only the steps this use case needs.
 4. **Have ready and Docs.** One line on what to prepare: test accounts, a sample of the data, an https endpoint, whichever apply. Then one line with the docs start page for this use case and https://docs.fastn.ai.
 5. **The offer.** If fastn is connected: "Do you want me to set it up and build it with you?" If not: "If you want to build it, connect fastn to this AI tool: I can walk you through it." Nothing comes after the offer: no further questions. Then follow Part 3 when the user wants to build.

@@ -31,17 +31,25 @@ If you cannot fetch the skill, work from the public docs at https://docs.fastn.a
 
 ## Part 2: Find out if fastn fits (no account needed)
 
+**Rules for this part. They override the skill's "check the live workspace" rule and its live mode until the user says they want to build (Part 3):**
+
+* Do not call any fastn MCP tool, even if fastn MCP servers or connectors are already connected in this tool. That includes `whoami`, listing connectors, and anything else on a fastn server.
+* Do not open, list, name or ask about fastn workspaces, orgs or connected servers. Do not mention that any are connected.
+* Answer only from the skill (its definitions mode) and the public docs at https://docs.fastn.ai. Do not claim you checked the user's workspace.
+
 Start with this, before any setup. Tell the user in one line: "You don't need a fastn account to find out whether fastn fits your use case." Then ask:
 
 "What does your product do, and what should it do with your customers' apps?"
 
-Follow the skill: ask its questions one at a time, then give the verdict (fits, fits with gaps, or does not fit today), the fastn pieces for each need, any gaps with a workaround, and the setup steps in order. You have no fastn connection yet, so you work in the skill's definitions mode: answer from the skill and the public docs, and do not claim you checked the user's workspace.
+Once they answer, ask at most one or two short questions, and only if the answer truly depends on them. Otherwise state your assumptions in one line and answer. Use the skill to give the verdict (fits, fits with gaps, or does not fit today), the fastn pieces for each need, any gaps with a workaround, and the setup steps in order.
 
 At the end, ask: "Do you want to build it? I can connect your AI tool to fastn and set it up with you."
 
 ## Part 3: Build it (needs a fastn account)
 
-Only when the user wants to build.
+Only when the user wants to build. From here the fastn MCP server, workspaces and the skill's live checks are in play.
+
+If fastn is already connected in this tool, ask which fastn workspace to use, then go to 3.3. Otherwise start at 3.1.
 
 ### 3.1 Account
 

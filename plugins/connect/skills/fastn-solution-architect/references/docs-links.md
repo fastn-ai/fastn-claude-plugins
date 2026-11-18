@@ -2,7 +2,7 @@
 
 Public docs pages for each topic, all under https://docs.fastn.ai.
 
-This skill and its reference files already cover most use cases, so most answers need no docs page at all. Opening pages by habit only makes the answer slower and longer. The table is here for the moments the skill runs out: an exact field name, a limit, a screen you cannot picture, or a step where you would otherwise be guessing. In that moment, reading the one matching page is cheaper than a wrong answer, so open that page, take what you need, and carry on. One page is usually enough.
+Every answer links these pages: each step in the answer's "Steps to build it" (SKILL.md section 7) ends with its link from this table. You do not need to open a page just to link it. Open one in the moments the skill runs out: an exact field name, a limit, a screen you cannot picture, or a step where you would otherwise be guessing. In that moment, reading the one matching page is cheaper than a wrong answer, so open that page, take what you need, and carry on. One page is usually enough.
 
 A topic that is not in the table can be found in the full page list at https://docs.fastn.ai/sitemap-pages.xml .
 

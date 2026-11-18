@@ -26,7 +26,9 @@ If the first message is vague ("can fastn do integrations for us?"), answer in o
 
 Check which mode you are in.
 
-- **Live mode**: the fastn MCP tools are in your tool list (for example `listConnectors`, `getConnector`, `listActions`; they usually carry a prefix such as `fastnPlatform__`). If the gateway asks you to read its own playbook first, do that, then call `whoami` to confirm the workspace and your role. Use live checks for every verdict.
+- **Live mode**: the fastn MCP tools are in your tool list (for example `listConnectors`, `getConnector`, `listActions`; they usually carry a prefix such as `fastnPlatform__`).
+  - **More than one fastn connection or workspace.** Several fastn MCP servers can be connected at once, each to a different workspace or org, and some may belong to other companies. Before any fastn tool call, ask once, in one short line, which one to use, for example: "You have more than one fastn connection here. Which one should I check?" Do not list their contents or call any of them to find out, and do not pick one yourself: a `whoami` call counts as using it. Then use only that one for the rest of the conversation. Every fact you report (connectors, events, plan, roles) must come from that one workspace.
+  - Once there is one connection, if the gateway asks you to read its own playbook first, do that, then call `whoami` to confirm the workspace and your role. Use live checks for every verdict.
 - **Definitions mode**: no fastn tools. Work from section 4 and the public docs at https://docs.fastn.ai. Tell the user once that connecting takes about two minutes and removes the guesswork:
   - Add fastn as an MCP server at `https://mcp.fastn.dev/fastn-workspace` and sign in. No API key is needed. The **Developer** role or above is required.
   - Guides exist for Claude, Claude Code, ChatGPT, Cursor, VS Code, Codex, Antigravity, Devin, Cline, Lovable and Bolt (docs: Build → Connect your AI tool).
@@ -232,9 +234,13 @@ Write it in this shape, short and confident:
 2. **How it would work.** A short numbered list, one line per part, each starting with the fastn piece in bold, so the user sees which piece does which job: "**Webhook trigger.** Your backend sends each item to a URL fastn gives you." "**Workflow.** It turns each item into a record and calls the app's action." "**Widget.** Each customer connects their own account inside your product." Name the real actions or unified entities you found, in code style, when that helps a developer.
 3. **Things to know.** Three or four bullets at most, only what the user must decide or prepare for: how each app signs in, a choice that is theirs to make, how to avoid duplicates, a plan detail they will meet (say what you saw and point to **Settings → Billing**; no prices). Leave out your own test results and stage labels.
 4. **Still to come.** Only when something is really missing on fastn's side (section 9): what it is, what you will build instead for now, and that you logged it with fastn.
-5. **What to have ready.** One line: test accounts, a sample payload, an https endpoint, OAuth app details, whichever apply.
+5. **Steps to build it.** A numbered list in build order, only the steps this use case needs (for example: connect your product, the connectors and connections, the widget, the trigger, the workflow, test and go live). Every step is one line and ends with its docs link from `references/docs-links.md`. Open each page you link, or take it from that table; never make up a link.
+6. **What to have ready.** One line: test accounts, a sample payload, an https endpoint, OAuth app details, whichever apply.
+7. **Docs.** One line with the start page for this use case and https://docs.fastn.ai.
 
-End with one plain line that offers the build, for example: "Say **build it** and I will set this up in your workspace, or tell me what to change." Do not use the question tool for this last step, for the reason at the top of this section. Keep the detailed order of work for yourself.
+In definitions mode, the one-line answer says it is based on fastn's docs, not on their workspace.
+
+End with one plain line that offers the build, for example: "Say **build it** and I will set this up in your workspace, or tell me what to change." In definitions mode, offer to connect fastn first. Do not use the question tool for this last step, for the reason at the top of this section.
 
 ## 8. Build it
 

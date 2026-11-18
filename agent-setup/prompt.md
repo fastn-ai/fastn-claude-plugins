@@ -37,11 +37,14 @@ Tell the user in one line: "You don't need a fastn account to find out whether f
 
 Once they answer, ask at most one or two short questions, and only if the answer truly depends on them. Otherwise state your assumptions in one line and answer.
 
+**The rules in this part override any answer format or order in the skill**, including its "Write it in this shape" section. Use the skill for what fastn can do and how to check it; use this part for which connection to use and how to write the answer.
+
 ### 2.1 Check the fit
 
 First see whether fastn is already connected in this tool (fastn MCP tools are available).
 
-* **fastn is connected:** use it to check the fit, following the skill: look up the connectors, actions, events and unified APIs the use case needs. If there is more than one fastn connection or workspace, ask once, in one short line, which one to use. Do not list them all. Say in your answer that you checked their fastn workspace.
+* **fastn is connected:** use it to check the fit, following the skill: look up the connectors, actions, events and unified APIs the use case needs. Say in your answer that you checked their fastn workspace.
+* **More than one fastn connection or workspace is connected:** before any fastn tool call, ask once, in one short line, which one to use, for example "You have more than one fastn connection here. Which one should I check?" Do not list them or look inside them, and never pick one yourself: some may belong to other companies, and even a `whoami` call counts as using one. Then use only that one, and report facts (connectors, events, plan) only from it.
 * **fastn is not connected:** answer from the skill and the docs only. Say plainly that the answer is based on fastn's docs, not on their account.
 
 ### 2.2 Use the docs, and link them

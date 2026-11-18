@@ -35,7 +35,9 @@ Tell the user in one line: "You don't need a fastn account to find out whether f
 
 "What does your product do, and what should it do with your customers' apps?"
 
-Once they answer, ask at most one or two short questions, and only if the answer truly depends on them. Otherwise state your assumptions in one line and answer.
+Ask at most two questions before the answer, in total, counting the workspace question in 2.1. If you need more, state your best guess in one line and answer.
+
+Never name, list or describe the user's connected MCP servers, fastn connections or workspaces in any reply, not even when asking which one to use, and never say whose org or workspace a connection belongs to. Plan, limit and role facts come only from the workspace the user chose.
 
 **The rules in this part override any answer format or order in the skill**, including its "Write it in this shape" section. Use the skill for what fastn can do and how to check it; use this part for which connection to use and how to write the answer.
 
@@ -44,7 +46,7 @@ Once they answer, ask at most one or two short questions, and only if the answer
 First see whether fastn is already connected in this tool (fastn MCP tools are available).
 
 * **fastn is connected:** use it to check the fit, following the skill: look up the connectors, actions, events and unified APIs the use case needs. Say in your answer that you checked their fastn workspace.
-* **More than one fastn connection or workspace is connected:** before any fastn tool call, ask once, in one short line, which one to use, for example "You have more than one fastn connection here. Which one should I check?" Do not list them or look inside them, and never pick one yourself: some may belong to other companies, and even a `whoami` call counts as using one. Then use only that one, and report facts (connectors, events, plan) only from it.
+* **More than one fastn connection or workspace is connected:** before any fastn tool call (`whoami` included), ask exactly "Which fastn workspace should I use for this?" and let the user name it. Never pick one yourself or call one to find out: some may belong to other companies. Then use only that one, and report facts (connectors, events, plan) only from it. Until the user answers, work from the docs.
 * **fastn is not connected:** answer from the skill and the docs only. Say plainly that the answer is based on fastn's docs, not on their account.
 
 ### 2.2 Use the docs, and link them

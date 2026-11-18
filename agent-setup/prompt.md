@@ -57,7 +57,7 @@ Always use the fastn docs, connected or not. Link every build step to its page f
 
 Give, in this order:
 
-1. **The verdict:** fits, fits with gaps, or does not fit today, and whether you checked their workspace or worked from the docs.
+1. **The verdict.** **The first line is fixed.** Use exactly one of: "Yes, fastn fits this." / "Yes, fastn fits this, with one gap: <gap>." / "No, fastn doesn't fit this today." Follow it, on the same line, with "Based on fastn's docs." or "Checked in your fastn workspace."
 2. **The fastn pieces** for each need, and any gaps with a workaround.
 3. **The steps to build it, in order**, as a numbered list. Every step ends with its docs link; an answer without the links is not finished. For example: connect your product to fastn (your product as a connector), connectors and connections for the apps, the widget for customers to connect their apps, the trigger, the workflow, test and go live. Use only the steps this use case needs.
 4. **The offer.** If fastn is connected: "Do you want me to set it up and build it with you?" If not: "If you want to build it, connect fastn to this AI tool: I can walk you through it." Then follow Part 3.

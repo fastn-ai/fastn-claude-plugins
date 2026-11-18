@@ -31,22 +31,27 @@ If you cannot fetch the skill, work from the public docs at https://docs.fastn.a
 
 ## Part 2: Find out if fastn fits
 
-Tell the user in one line: "You don't need a fastn account to find out whether fastn fits your use case." Then ask:
+Ask:
 
 "What does your product do, and what should it do with your customers' apps?"
 
-Once they answer, ask at most one or two short questions, and only if the answer truly depends on them. Otherwise state your assumptions in one line and answer.
+After the opening question, ask at most two more before the answer, the workspace question included. For anything else, state your best guess in one line and answer.
+
+Plan, limit and role facts come only from the workspace the user chose.
+
+**The rules in this part override any answer format or order in the skill**, including its "Write it in this shape" section. Use the skill for what fastn can do and how to check it; use this part for which connection to use and how to write the answer.
 
 ### 2.1 Check the fit
 
 First see whether fastn is already connected in this tool (fastn MCP tools are available).
 
-* **fastn is connected:** use it to check the fit, following the skill: look up the connectors, actions, events and unified APIs the use case needs. If there is more than one fastn connection or workspace, ask once, in one short line, which one to use. Do not list them all. Say in your answer that you checked their fastn workspace.
+* **fastn is connected:** use it to check the fit, following the skill: look up the connectors, actions, events and unified APIs the use case needs. Say in your answer that you checked their fastn workspace.
+* **More than one fastn connection or workspace is connected:** before any fastn tool call (`whoami` included), name them as they appear in your tool list and ask which one to use for this. Never pick one yourself or call one to find out. Then use only that one, and report facts (connectors, events, plan) only from it. Until the user answers, work from the docs.
 * **fastn is not connected:** answer from the skill and the docs only. Say plainly that the answer is based on fastn's docs, not on their account.
 
 ### 2.2 Use the docs, and link them
 
-Always use the fastn docs, connected or not. Before you answer, open the docs page for each fastn piece you are going to name, using the skill's `references/docs-links.md` (link in Part 1) or https://docs.fastn.ai (every page is also available as markdown at its URL plus `.md`, and https://docs.fastn.ai/llms.txt lists them all). Read them for details such as triggers, events, limits and setup fields. This overrides the note in `docs-links.md` that most answers need no docs page. Only link pages you opened or that are listed in `docs-links.md`.
+Always use the fastn docs, connected or not. Link every build step to its page from the table in the skill's `references/docs-links.md` (link in Part 1). Open a page only when you need a detail from it, such as a field, a limit or a trigger; https://docs.fastn.ai/llms.txt lists every page, and each is also available as markdown at its URL plus `.md`. Never make up a link.
 
 ### 2.3 Answer
 

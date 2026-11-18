@@ -35,7 +35,7 @@ Ask:
 
 "What does your product do, and what should it do with your customers' apps?"
 
-Ask at most two questions before the answer, in total, counting the workspace question in 2.1. If you need more, state your best guess in one line and answer.
+After the opening question, ask at most two more before the answer, the workspace question included. For anything else, state your best guess in one line and answer.
 
 Plan, limit and role facts come only from the workspace the user chose.
 
@@ -51,7 +51,7 @@ First see whether fastn is already connected in this tool (fastn MCP tools are a
 
 ### 2.2 Use the docs, and link them
 
-Always use the fastn docs, connected or not. Before you answer, open the docs page for each fastn piece you are going to name, using the skill's `references/docs-links.md` (link in Part 1) or https://docs.fastn.ai (every page is also available as markdown at its URL plus `.md`, and https://docs.fastn.ai/llms.txt lists them all). Read them for details such as triggers, events, limits and setup fields. This overrides the note in `docs-links.md` that most answers need no docs page. Only link pages you opened or that are listed in `docs-links.md`.
+Always use the fastn docs, connected or not. Link every build step to its page from the table in the skill's `references/docs-links.md` (link in Part 1). Open a page only when you need a detail from it, such as a field, a limit or a trigger; https://docs.fastn.ai/llms.txt lists every page, and each is also available as markdown at its URL plus `.md`. Never make up a link.
 
 ### 2.3 Answer
 

@@ -9,7 +9,7 @@ Made-up companies and example apps. They show the shape of a good answer, not fa
 
 **Answer**
 
-Yes, fastn fits this. Checked in your fastn workspace. The CRMs your customers use are in the catalog, and the deal data is covered by one unified API.
+Yes, fastn fits this: when a deal closes in a customer's CRM, fastn can create the draft invoice in Ledgerly, whichever CRM that customer uses. I checked this in your fastn workspace: the CRMs your customers use are in the catalog, and the deal data is covered by one unified API.
 
 How it would work:
 1. **Widget.** Each customer connects their own CRM inside Ledgerly.

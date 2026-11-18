@@ -29,19 +29,37 @@ Follow it for the rest of this conversation. When it points to one of its refere
 
 If you cannot fetch the skill, work from the public docs at https://docs.fastn.ai and tell the user once that you are doing so.
 
-## Part 2: Find out if fastn fits (no account needed)
+## Part 2: Find out if fastn fits
 
-Start with this, before any setup. Tell the user in one line: "You don't need a fastn account to find out whether fastn fits your use case." Then ask:
+Tell the user in one line: "You don't need a fastn account to find out whether fastn fits your use case." Then ask:
 
 "What does your product do, and what should it do with your customers' apps?"
 
-Follow the skill: ask its questions one at a time, then give the verdict (fits, fits with gaps, or does not fit today), the fastn pieces for each need, any gaps with a workaround, and the setup steps in order. You have no fastn connection yet, so you work in the skill's definitions mode: answer from the skill and the public docs, and do not claim you checked the user's workspace.
+Once they answer, ask at most one or two short questions, and only if the answer truly depends on them. Otherwise state your assumptions in one line and answer.
 
-At the end, ask: "Do you want to build it? I can connect your AI tool to fastn and set it up with you."
+### 2.1 Check the fit
+
+First see whether fastn is already connected in this tool (fastn MCP tools are available).
+
+* **fastn is connected:** use it to check the fit, following the skill: look up the connectors, actions, events and unified APIs the use case needs. If there is more than one fastn connection or workspace, ask once, in one short line, which one to use. Do not list them all. Say in your answer that you checked their fastn workspace.
+* **fastn is not connected:** answer from the skill and the docs only. Say plainly that the answer is based on fastn's docs, not on their account.
+
+### 2.2 Use the docs, and link them
+
+Always use the fastn docs, connected or not. Before you answer, open the docs page for each fastn piece you are going to name, using the skill's `references/docs-links.md` (link in Part 1) or https://docs.fastn.ai (every page is also available as markdown at its URL plus `.md`, and https://docs.fastn.ai/llms.txt lists them all). Read them for details such as triggers, events, limits and setup fields. This overrides the note in `docs-links.md` that most answers need no docs page. Only link pages you opened or that are listed in `docs-links.md`.
+
+### 2.3 Answer
+
+Give, in this order:
+
+1. **The verdict:** fits, fits with gaps, or does not fit today, and whether you checked their workspace or worked from the docs.
+2. **The fastn pieces** for each need, and any gaps with a workaround.
+3. **The steps to build it, in order**, as a numbered list. Every step ends with its docs link; an answer without the links is not finished. For example: connect your product to fastn (your product as a connector), connectors and connections for the apps, the widget for customers to connect their apps, the trigger, the workflow, test and go live. Use only the steps this use case needs.
+4. **The offer.** If fastn is connected: "Do you want me to set it up and build it with you?" If not: "If you want to build it, connect fastn to this AI tool: I can walk you through it." Then follow Part 3.
 
 ## Part 3: Build it (needs a fastn account)
 
-Only when the user wants to build.
+Only when the user wants to build. If fastn is already connected in this tool, go to 3.3. Otherwise start at 3.1.
 
 ### 3.1 Account
 
@@ -108,7 +126,7 @@ Codex opens the sign-in in the browser. If it does not, run `codex mcp login fas
 
 ### 3.3 Build
 
-Once the fastn tools are available, go back to the skill: check the user's workspace with the fastn tools, confirm the design, and build it step by step. The skill names the fastn building skill each part needs. Fetch it when you reach that part:
+Once the fastn tools are available, go back to the skill: check the user's workspace with the fastn tools, confirm the design, and build it step by step, following the steps from 2.3 and their docs pages. The skill names the fastn building skill each part needs. Fetch it when you reach that part:
 
 | Skill | Use it for | Raw URL |
 | --- | --- | --- |

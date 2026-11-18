@@ -46,7 +46,7 @@ First see whether fastn is already connected in this tool (fastn MCP tools are a
 
 ### 2.2 Use the docs, and link them
 
-Always use the fastn docs, connected or not. Fetch the docs pages that match the use case, from the skill's `references/docs-links.md` (link in Part 1) or from https://docs.fastn.ai (every page is also available as markdown at its URL plus `.md`, and https://docs.fastn.ai/llms.txt lists them all). Read them for details such as triggers, events, limits and setup fields. This overrides the note in `docs-links.md` that most answers need no docs page. Only link pages you opened or that are listed in `docs-links.md`.
+Always use the fastn docs, connected or not. Before you answer, open the docs page for each fastn piece you are going to name, using the skill's `references/docs-links.md` (link in Part 1) or https://docs.fastn.ai (every page is also available as markdown at its URL plus `.md`, and https://docs.fastn.ai/llms.txt lists them all). Read them for details such as triggers, events, limits and setup fields. This overrides the note in `docs-links.md` that most answers need no docs page. Only link pages you opened or that are listed in `docs-links.md`.
 
 ### 2.3 Answer
 
@@ -54,7 +54,7 @@ Give, in this order:
 
 1. **The verdict:** fits, fits with gaps, or does not fit today, and whether you checked their workspace or worked from the docs.
 2. **The fastn pieces** for each need, and any gaps with a workaround.
-3. **The steps to build it, in order**, each with its docs link. For example: connect your product to fastn (your product as a connector), connectors and connections for the apps, the widget for customers to connect their apps, the trigger, the workflow, test and go live. Use only the steps this use case needs.
+3. **The steps to build it, in order**, as a numbered list. Every step ends with its docs link; an answer without the links is not finished. For example: connect your product to fastn (your product as a connector), connectors and connections for the apps, the widget for customers to connect their apps, the trigger, the workflow, test and go live. Use only the steps this use case needs.
 4. **The offer.** If fastn is connected: "Do you want me to set it up and build it with you?" If not: "If you want to build it, connect fastn to this AI tool: I can walk you through it." Then follow Part 3.
 
 ## Part 3: Build it (needs a fastn account)

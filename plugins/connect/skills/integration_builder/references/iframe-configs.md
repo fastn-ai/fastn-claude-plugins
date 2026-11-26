@@ -9,7 +9,7 @@ If unsure, ask in one line which they want, recommending a config when it covers
 
 ## Configs
 
-A partner (the SaaS company) can save how its embedded integrations hub looks as a named **iframe config**: title, logo, theme tokens, which sections show, the screen it opens on, and view options. Every page that loads the config picks up a change on its next load, with no redeploy on the partner's side. Each save is a new version; nothing is ever overwritten.
+A partner (the SaaS company, e.g. Cin7 or HP) can save how its embedded integrations hub looks as a named **iframe config**: title, logo, theme tokens, which sections show, the screen it opens on, and view options. Every page that loads the config picks up a change on its next load, with no redeploy on the partner's side. Each save is a new version; nothing is ever overwritten.
 
 Use this when the partner asks to change how the hub LOOKS or what it SHOWS: "make it our orange", "rounder corners", "hide insights", "open on the apps list", "put our logo on it", "give me a link to our styled hub". It is not for an integration's behaviour (that is the workflow / config / widget) and not for one widget card's styling inside the Widget Builder.
 
@@ -44,7 +44,7 @@ Every field is optional; `{}` is the hub's defaults. Unknown keys are refused (4
 
 ## How to change one
 
-1. `listEmbedIframeConfigs`. One config: use it. Several: ask which (by name). None: offer to create one, and name it after the product or surface ("Product X Connect").
+1. `listEmbedIframeConfigs`. One config: use it. Several: ask which (by name). None: offer to create one, and name it after the product or surface ("Cin7 Connect").
 2. `getEmbedIframeConfig` and note its `version`.
 3. Translate the request into the SMALLEST patch: send only what changes. `updateEmbedIframeConfig { id, config: { theme: { primary: "#ea580c" } }, baseVersion: <version you read>, note: "<what the user asked, in their words>" }`. Everything else stays as it was. `null` removes a field, or one key inside `theme` / `sections` / `viewOptions`.
    - Turn colour names into a concrete hex and say which one you picked. "Rounder" is a number (e.g. radius 8 → 16), not a word.

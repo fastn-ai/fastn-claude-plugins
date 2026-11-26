@@ -77,7 +77,7 @@ Precedence, **first match wins**:
 - **`fastnPlatform__probeConnector` / `fastnPlatform__probeConnectorValues`** — like `fastnPlatform__runWorkflowCode` but generate the code. Accept `connectionId` (pin a specific connection), `endOrgId`, `installationId`.
 - **`fastnPlatform__createWorkflow`** — doesn't execute; saves code + auto-extracts the manifest (all `SAAS` by default). No connection used at create time; it sets the policy.
 - **`fastnPlatform__testSavedWorkflow`** — uses the manifest (saved workflow). `SAAS` → resolves on its own; `MULTI_TENANT` → must pass `headers` with `x-end-org-id` (Mode A) or `x-installation-id` (Mode B) or it errors. The installation is most faithful (pulls the install's connections map + config clone). `mockMode: true` bypasses connections entirely.
-- **`new Fastn({ connectors })` options in sandbox code:** `{ orgId: "managed"|"custom", version }`. Declaring a connector is optional: bare `fastn.connector.X` works for community (owned by the platform's own org) and custom connectors alike. To pin one call to a connection use `{ pinConnectionId }` on the call; to run one connector on two connections, pin each call with its own `pinConnectionId`. Do not choose the connection with a `connectionId` in this config: it is not honoured for a `MULTI_TENANT` connector or over an installation's pin.
+- **`new Fastn({ connectors })` options in sandbox code:** `{ orgId: "managed"|"custom", version }`. Declaring a connector is optional: bare `fastn.connector.X` works for community (`org_id="org_platform"`) and custom connectors alike. To pin one call to a connection use `{ pinConnectionId }` on the call; to run one connector on two connections, pin each call with its own `pinConnectionId`. Do not choose the connection with a `connectionId` in this config: it is not honoured for a `MULTI_TENANT` connector or over an installation's pin.
 
 ---
 
@@ -90,22 +90,24 @@ Precedence, **first match wins**:
 ### Path A — single-tenant (the developer's own data, internal automation)
 *"Sync MY X to MY Y."*
 ```
-probe → fastnPlatform__createWorkflow → fastnPlatform__testSavedWorkflow → bind trigger → fastnPlatform__createWidget
+draft widget + preview connect (PHASE 0) → probe → fastnPlatform__createWorkflow → fastnPlatform__testSavedWorkflow → bind trigger
+      → fastnPlatform__updateWidget (attach, activate)
 ```
-- Manifest stays all `SAAS` (= developer's own connections). **The agent ignores the manifest — `fastnPlatform__setWorkflowConnectorScope` is NOT used.** The **widget IS still created** (every build ends with one).
+- Manifest stays all `SAAS` (= developer's own connections). **The agent ignores the manifest — `fastnPlatform__setWorkflowConnectorScope` is NOT used.** The **widget IS still created** (every build starts with its draft and ends by activating it).
 - This is the **default for everyday automations.**
 
 ### Path B — multi-tenant (a product shipped to the partner's customers)
 *"Let MY CUSTOMERS sync THEIR X to THEIR Y" / "build a widget" / "embed."*
 ```
-probe → fastnPlatform__createWorkflow → fastnPlatform__setWorkflowConnectorScope (MULTI_TENANT) → (self-install test)
-      → fastnPlatform__proposeConfiguration → reviewUrl → fastnPlatform__getConfigDraft → configId (= the template)
-      → fastnPlatform__createWidget(configId) → publish
+draft widget + preview connect (PHASE 0)
+      → probe → fastnPlatform__createWorkflow → fastnPlatform__setWorkflowConnectorScope (MULTI_TENANT) → (self-install test)
+      → fastnPlatform__proposeConfiguration { widget_id } → reviewUrl → fastnPlatform__getConfigDraft → configId (= the template)
+      → publish → fastnPlatform__updateWidget (attach, activate)
 ```
 - **Manifest tuning** (`fastnPlatform__setWorkflowConnectorScope`) is the part that **only happens here** — the widget itself is built in both paths.
 - The config is persisted exactly as in Path A — via `fastnPlatform__proposeConfiguration` + browser approval (see `references/mapping.md`). The resulting `configId` **is the template** the embed clones per customer (§10). `fastnPlatform__createConfig` is only the headless direct-save alternative (no review UI) — not part of the normal flow.
 
-> **▎ Rule for the skill:** treat **manifest tuning (`fastnPlatform__setWorkflowConnectorScope`) as Path-B-only** — NOT the widget. Don't touch the manifest for normal automations — all-SAAS is already correct. The widget is the final step of **every** build (`references/build.md` step 8); the only Path-B addition is flipping per-customer connectors to `MULTI_TENANT` before it.
+> **▎ Rule for the skill:** treat **manifest tuning (`fastnPlatform__setWorkflowConnectorScope`) as Path-B-only** — NOT the widget. Don't touch the manifest for normal automations — all-SAAS is already correct. The widget is the first and last step of **every** build (PHASE 0 creates the draft, `references/build.md` step 8 activates it); the only Path-B addition is flipping per-customer connectors to `MULTI_TENANT` before it.
 
 ---
 
@@ -143,7 +145,7 @@ A `MULTI_TENANT` flow can't be `fastnPlatform__testSavedWorkflow`'d with no cont
 
 ## 10. Configs — template vs clone
 
-- **The agent authors the template only.** The template is the approved config from MAP — persisted via `fastnPlatform__proposeConfiguration → reviewUrl → fastnPlatform__getConfigDraft → configId` (the normal interactive path, see `references/mapping.md`). That `configId` (template = `end_org_id` null) is what the widget binds to. `fastnPlatform__createConfig` is a headless direct-save alternative (takes `{ configuration }` only — no `widgetId`; bind via `fastnPlatform__createWidget(configId)`); reach for it only when you already hold an approved config object and don't need the browser review round-trip.
+- **The agent authors the template only.** The template is the approved config from MAP — persisted via `fastnPlatform__proposeConfiguration → reviewUrl → fastnPlatform__getConfigDraft → configId` (the normal interactive path, see `references/mapping.md`). That `configId` (template = `end_org_id` null) is what the widget binds to. `fastnPlatform__createConfig` is a headless direct-save alternative (takes `{ configuration }` only — link it with `fastnPlatform__updateConfig { id, widget_id }`); reach for it only when you already hold an approved config object and don't need the browser review round-trip.
 - **Clones are NOT created by the agent.** The embed's clone-on-configure mints a per-customer clone (`endOrgId` + `templateConfigId`) when a customer first configures, so the template is never edited in place.
 - **Workflow code should read config via `fastn.config.getByTemplate(templateId)`** (NOT `.get()`), so it resolves the customer's clone at runtime (installation → its clone; else end-org → its clone; else the template in dev). Single-tenant Path A flows that bind to one developer-owned config can use `.get(configId)`; multi-tenant Path B flows MUST use `getByTemplate` or every customer reads the partner's template instead of their own clone.
 - **Read-only clone inspection for debugging:** `fastnPlatform__listConfigs { endOrgId }` / `fastnPlatform__getConfig`.

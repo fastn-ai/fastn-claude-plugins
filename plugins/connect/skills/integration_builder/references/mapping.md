@@ -42,7 +42,7 @@ Quality rules — these are what make the proposal correct:
 - **Field-path notation for nested fields**, with the **root** entity as `sourceEntity` / `targetEntity`:
   - top-level → `targetField: "Name"`, `targetLabel: "Name"`
   - nested → `targetField: "Contacts.Email"`, `targetLabel: "Contacts Email"`; `targetField: "Addresses.Line1"`
-  - `targetEntity: "Product X Customer"` — never `"Product X Customer Contact"` or a path.
+  - `targetEntity: "Cin7 Customer"` — never `"Cin7 Customer Contact"` or a path.
 - **1:1 only** — never one source → several targets, never several sources → one target. If a source could feed two, pick the single best and leave the other unmapped (the user splits/transforms at `reviewUrl`).
 - **Omit fields with no good match** — UNLESS the target field is a **required scalar leaf**, then include it with `confidence: "low"` and a reason like `"Required field — needs mapping"`. **Exception — a required target that is an array/object built by a reshape** (many source rows → one array/object, e.g. line-items → a `products` array): do NOT emit a mapping for it, not even at `confidence: "low"`. `fastnPlatform__proposeConfiguration` can't express the reshape, and a placeholder mapping locks its review row and blocks approval. **Omit it from `mappings[]` and build it in workflow code (PHASE 3)**, noting it to the user in chat. The "include required-unmapped at low confidence" rule is for **scalar leaf fields only**.
 - **Prefer the DROPDOWN over free text.** Whenever a field offers a constrained option set — an enum, a lookup/`enrich` dropdown, a picklist — the value must come from that option list (probed via `fastnPlatform__probeConnectorValues` / the lookup action), never a typed literal; a hand-typed string that isn't a real option silently fails at write time. Applies to mapping values, condition values, and the handling you recommend for empty required fields.
@@ -87,7 +87,7 @@ For `ongoing` / `initial_plus_ongoing`, pass `matchingStrategy` with `sourceProb
 One-time imports don't need a matching strategy.
 
 ## Step 6 — Call `fastnPlatform__proposeConfiguration` → review → approve → `configId`
-Call it **ONCE**, with ALL directions bundled in `directions` (bidirectional = two entries; multi-entity = one per pair). ONE config for the whole use case, never one per entity. For EACH direction you MUST pass:
+Call it **ONCE**, with ALL directions bundled in `directions` (bidirectional = two entries; multi-entity = one per pair). ONE config for the whole use case, never one per entity. Pass top-level **`widget_id`** = the PHASE 0 widget: the approved config is then saved linked to that widget, the only place the user can edit it later. For EACH direction you MUST pass:
 - **`sourceProbeId` + `targetProbeId`** (from Step 2) — without them the field lists, condition options, and matching keys come back empty.
 - **`sourceConnectorSlug` + `sourceActionSlug`** — the list/properties action you probed; drives source enrichment metadata.
 - **`targetConnectorSlug` + `targetActionSlug`** — `targetActionSlug` MUST be the target's **CREATE** action; the tool reads its input contract to detect required fields. Wrong/missing slug → required fields not detected.

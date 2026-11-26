@@ -48,7 +48,7 @@ plugins/connect/
   commands/plan.md                    the /connect:plan command
   skills/<slug>/                      the published fastn skills, bundled (fastn_onboarding,
                                       integration_builder, connector_builder, unified_api,
-                                      workflow_verifier), each SKILL.md + its references/
+                                      workflow_verifier, regression_qa, widget_page_builder), each SKILL.md + its references/
   skills/fastn-solution-architect/    plans an integration: asks about the use case, maps each need
                                       to the right fastn piece, checks the live workspace when the
                                       gateway is connected, and guides the setup (SKILL.md +
@@ -69,8 +69,10 @@ Keep `plugin.json` and `plugins/connect/.claude-plugin/plugin.json` in sync (sam
 | `connector_builder` | Builds, tests and debugs connectors, actions, auth methods and events. |
 | `unified_api` | Sets up and uses the unified API across providers. |
 | `workflow_verifier` | Proves a workflow, trigger or widget works end to end, with a report. |
+| `regression_qa` | Gates any change to an integration that is already live: re-runs its tests before the change ships. |
+| `widget_page_builder` | Builds a fully custom integrations page on fastn's UI library, hosted by fastn. |
 
-The six fastn skills other than `fastn-solution-architect` are the versions the gateway publishes, copied as is and stamped with their version (`<!-- fastn skill: <slug> v<N> -->`), so they work offline and before sign-in. The gateway stays the source of truth: when it publishes a newer version, the `gateway` skill's version check finds it and installs the newer copy. To refresh the bundled copies, download each skill's zip from the gateway's `skill` tool and unzip it over `plugins/connect/skills/`.
+The eight fastn skills other than `fastn-solution-architect` are the versions the gateway publishes, copied as is and stamped with their version (`<!-- fastn skill: <slug> v<N> -->`), so they work offline and before sign-in. The gateway stays the source of truth: when it publishes a newer version, the `gateway` skill's version check finds it and installs the newer copy. To refresh the bundled copies, download each skill's zip from the gateway's `skill` tool and unzip it over `plugins/connect/skills/`.
 
 There is also one command: `/connect:plan <use case>` starts the `fastn-solution-architect` skill on a use case.
 

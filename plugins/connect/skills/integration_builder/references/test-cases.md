@@ -116,6 +116,8 @@ Call **`fastnPlatform__createTestCaseDraft`** with the structured set above. It 
 
 ## THE SUITE IS A REGRESSION GATE — re-run it after EVERY change, for the life of the flow
 
+> Flow already live? Passing this suite on the new version is not the end: run `regression_qa` next (UPDATES TO A LIVE INTEGRATION in SKILL.md). It compares the new version with the live one for every customer and decides whether the update ships.
+
 The approved cases are not a one-time build checklist — they are the flow's **permanent acceptance contract**, and incremental changes are where working integrations break: an edit that quietly turns a read-only flow into a live writer, a rewrite that changes an error message a case asserts on, a config repoint the flows never picked up. Every one of those ships silently unless the suite is re-run. Attaching cases and never executing them (`lastValidation: null`) is the same as having no tests.
 
 - **ANY change re-arms the gate.** After `fastnPlatform__updateWorkflow`, `fastnPlatform__editWorkflowCode`, repointing a flow to a new `configId`, an approved config edit, or a change to a connector action the flow calls — **re-run the FULL attached suite for every affected flow** and assert each `pass` condition again, exactly as in BUILD step 6, then persist with `fastnPlatform__saveWorkflowValidation`. Not just the case that covers what you changed: a regression run exists to catch what you did **NOT** intend to change. A shared change (config, connector action, env-config) affects EVERY flow that reads it — re-run each one's suite, not only the flow you were asked to touch.
